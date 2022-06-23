@@ -1,11 +1,18 @@
-import ccxt
+import ccxt, json
 import pandas as pd
+
+
+with open('config.json', 'r') as f: 
+    config = json.load(f)
+
+api_key = config['exchange']['apiKey'] # enter keys in config.json 
+api_secret = config['exchange']['secret']
 
 exchange = ccxt.ftx()
 exchange_class = getattr(ccxt, 'ftx') #change exchange name here 
 exchange = exchange_class({
-    'apiKey': "",
-    'secret': "",
+    'apiKey': api_key,
+    'secret': api_secret,
     'test': False,
 })
 
@@ -24,40 +31,21 @@ def find_all_exchange_tickers(exchange):
     df.to_csv('Tickers.csv', mode='w+', index=False, header=False) ## Change the name of the cvs to suit your exchange
     return tickers
 
-def find_active_BTC_ETH_futures(exchange):
+def find_futures_symbols(exchange):
     exchange.loadMarkets()
     symbols = exchange.symbols
     tickers=[]
     for symbol in symbols:
-        if not '.' in symbol:
-            if 'BTC/USD'in symbol or 'ETH/USD' in symbol:
+        if not '.' in symbol: # '.' denotes inactive symbols, remove the not to find inactive futures
+            if 'BTC/USD'in symbol or 'ETH/USD' in symbol: # change paramaters as needed
                 tickers.append(symbol)
             if 'XBT' in symbol and '_' not in symbol:
                 tickers.append(symbol)
-    # df = pd.DataFrame(tickers)
-    # df.to_csv('ActiveFutures.csv', mode='a', index=False, header=False)
     return tickers
 
-# def find_inactive_BTC_ETH_futures(exchange):
-#     exchange.loadMarkets()
-#     symbols = exchange.symbols
-#     tickers=[]
-#     for symbol in symbols:
-#         if '.' in symbol:
-#             if 'BTC/USD'in symbol or 'ETH/USD' in symbol:
-#                 tickers.append(symbol)
-#             if 'XBT' in symbol and '_' not in symbol:
-#                 tickers.append(symbol)
-#     # df = pd.DataFrame(tickers)
-#     # df.to_csv('InactiveFutures.csv', mode='a', index=False, header=False)
-#     return tickers
-
 def main():
-    # for i in find_active_BTC_ETH_futures(exchange):
-    #     print(i)
     for i in find_all_exchange_tickers(exchange):
         print(i)
-
 
 if __name__ == '__main__':
     main()
