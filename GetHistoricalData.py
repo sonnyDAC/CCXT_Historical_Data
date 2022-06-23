@@ -46,7 +46,7 @@ def get_historical_data():
         df = pd.DataFrame(bars[:-1], columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
         df.to_csv('1mTimeFrame.csv', mode='a', index=False, header=False)
-        from_timestamp *= minute
+        from_timestamp += len(bars) * minute
         
     print('Finished getting historical data')
 
@@ -85,10 +85,9 @@ def get_historical_trades():
         from_timestamp += 3600 * 1000 # increment by one hour
 
 # call functions here
-def main():
-    # get_historical_data()
-    get_expired_historical_data()
-    # get_historical_trades()
+get_historical_data()
+# get_expired_historical_data()
+# get_historical_trades()
 
 #TODO: timeframe resampler
 ## resample lower timeframe data into higher timeframes
